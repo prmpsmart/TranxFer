@@ -11,6 +11,7 @@ def tranxFerMain():
     parser.add_argument("-P", "--port", type=int, dest="port", help="port of the address")
     parser.add_argument("-v", "--version", action="version", version="TranxFer by PRMP Smart Version = 2.1.0")
     parser.add_argument("-l", "--log", nargs='*', choices=('i', 'e', 'd', 'c', 'w'), help='Log level. i=info, e=error, d=debug, c=critical, w=warning.')
+    parser.add_argument("-c", "--compress", action="store_true", help="Compress before TranxFer")
     
     group1 = parser.add_mutually_exclusive_group()
     group1.add_argument("-p", "--path", type=str, dest="path", help="path to send")
@@ -22,6 +23,7 @@ def tranxFerMain():
     group2.add_argument("-f", "--full", action="store_true", help="Full  File TranxFer")
     group2.add_argument("-m", "--mini", action="store_true", help="Mini File TranxFer")
     
+    
 
     args = parser.parse_args()
     
@@ -30,6 +32,7 @@ def tranxFerMain():
     path = args.path
     addr = args.addr
     port = args.port
+    compress = args.compress
     dest = args.dest
     download = args.download
     upload = args.upload
@@ -53,6 +56,7 @@ def tranxFerMain():
         GuiMixin._path = path or dest
         GuiMixin._port = port
         GuiMixin._server = addr
+        GuiMixin._compress = compress
         if mini: FileTranxFer(0)
         else: FileTranxFer()
     
@@ -62,7 +66,7 @@ def tranxFerMain():
             else: TranxFerLogger.error('Address to connect to is missing -a')
         
         elif upload:
-            if path: autoUpload(path, ip=addr, port=port)
+            if path: autoUpload(path, ip=addr, port=port, compress=compress)
             else: TranxFerLogger.error('Path to send is missing -f')
 
 

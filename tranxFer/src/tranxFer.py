@@ -364,6 +364,7 @@ class TranxFer(NetworkMixin):
 class AutoUploadHandler(BaseRequestHandler):
     
     path = ''
+    compress = False
     count = 0
     
     @classmethod
@@ -371,6 +372,8 @@ class AutoUploadHandler(BaseRequestHandler):
         assert path.exists(path_)
         cls.path = path_
         cls.count = 0
+    @classmethod
+    def setCompress(cls, comp): cls.compress = comp
     
     def setup(self):
         TranxFerLogger.info('Client Connected')
@@ -385,7 +388,7 @@ class AutoUploadHandler(BaseRequestHandler):
         # print(TranxFerLogger.cmd)
         self.tranxFer = None
         assert self.path != ''
-        self.tranxfer = TranxFer(self.request, LocalPathStat(self.path, latest=True))
+        self.tranxfer = TranxFer(self.request, LocalPathStat(self.path, latest=True, compress=self.compress))
         self.tranxfer.startTranxFer()
         # self.finishIt()
 
@@ -532,8 +535,10 @@ def connectedTranxFer(dest='', which='download', ip='localhost', port=7767, goOn
     tranxFer = TranxFer(soc, which='download', dest=dest, goOn=goOn)
     return tranxFer
 
-def autoUpload(path, ip='', port=7767):
+def autoUpload(path, ip='', port=7767, compress=True):
     AutoUploadHandler.setPath(path)
+    AutoUploadHandler.setCompress(compress)
+    
     AutoUploadServer(start=True)
 
 def autoDownload(dest='', ip='localhost', port=7767): connectedTranxFer(dest=dest, ip=ip, port=port, goOn=True, which='download').startTranxFer()
