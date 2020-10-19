@@ -395,9 +395,9 @@ class AutoUploadHandler(BaseRequestHandler):
 class AutoUploadServer(TCPServer, NetworkMixin):
     allow_reuse_address = True
     
-    def __init__(self, addr='', port=7767, handler=None, start=False):
+    def __init__(self, port=7767, handler=None, start=False):
         Handler = AutoUploadHandler if handler == None else handler
-        TCPServer.__init__(self, (addr, port), Handler)
+        TCPServer.__init__(self, ('', port), Handler)
         
         TranxFerLogger.info('Serving on %s : %d ' % (self.getNetwork().ip or self.lh, port))
         if start: self.start()
@@ -535,11 +535,11 @@ def connectedTranxFer(dest='', which='download', ip='localhost', port=7767, goOn
     tranxFer = TranxFer(soc, which='download', dest=dest, goOn=goOn)
     return tranxFer
 
-def autoUpload(path, ip='', port=7767, compress=True):
+def autoUpload(path, port=7767, compress=True):
     AutoUploadHandler.setPath(path)
     AutoUploadHandler.setCompress(compress)
     
-    AutoUploadServer(start=True)
+    AutoUploadServer(port=port, start=True)
 
 def autoDownload(dest='', ip='localhost', port=7767): connectedTranxFer(dest=dest, ip=ip, port=port, goOn=True, which='download').startTranxFer()
 

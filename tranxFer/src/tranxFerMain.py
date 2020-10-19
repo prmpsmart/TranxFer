@@ -66,7 +66,7 @@ def tranxFerMain():
             else: TranxFerLogger.error('Address to connect to is missing -a')
         
         elif upload:
-            if path: autoUpload(path, ip=addr, port=port, compress=compress)
+            if path: autoUpload(path, port=port, compress=compress)
             else: TranxFerLogger.error('Path to send is missing -f')
 
 
