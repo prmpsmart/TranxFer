@@ -115,7 +115,9 @@ class PathStat(Mixin):
         # else: return self.dicts['size']
 
     @property
-    def zipName(self): return self.fullName + '.zip'
+    def zipName(self):
+        if self.fullName.endswith('.zip'): return self.fullName
+        return self.fullName + '.zip'
     
     @property
     def pathFromRoot(self): 
@@ -151,7 +153,7 @@ class PathStat(Mixin):
         if self._dict: return self._dict
         
         isFile, isDir = self.isFile, self.isDir
-        if self.compress:
+        if self.compress and not isFile:
             isFile, isDir = True, False
             pathFromRoot = name = path.basename(self.zipName)
         else:
@@ -192,9 +194,8 @@ class PathStat(Mixin):
         if (self.openFile == None):
             # if self.isRemote:
 
-            p = self.turnToZip()
             if self.isFile:
-                self.openFile = open(p, pr)
+                self.openFile = open(self.fullName, pr)
                 self.opened = True
                 
             elif self.isDir:
@@ -202,6 +203,7 @@ class PathStat(Mixin):
                     m = 'A Directory %s can not be opened.'%self.name
                     TranxFerLogger.error(m)
                     raise OSError(m)
+                p = self.turnToZip()
                 self.openFile = open(p, pr)
             return self.openFile
         
@@ -286,14 +288,14 @@ class PathStat(Mixin):
 
     def turnToZip(self, u=0):
         if self.compress or u:
-            TranxFerLogger.info('Started Zipping %s.'%self.fullName)
             if self.zipped == False and self.isRemote == False:
+                TranxFerLogger.info('Started Zipping %s.'%self.fullName)
                 z = zipPath(str(self.fullName), self.zipName, latest=self.latest)
                 self.compress = True
                 self.zipped = True
                 assert z == self.zipName
                 TranxFerLogger.info('Ended Zipping %s.'%self.fullName)
-                return self.zipName
+            return self.zipName
         return self.fullName
 
 class LocalPathStat(PathStat):
