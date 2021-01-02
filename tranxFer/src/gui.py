@@ -1,4 +1,4 @@
-from prmp_gui.dialogs import *
+from .prmp_gui import *
 from .core import *
 
 def show(title=None, msg=None, which='info', **kwargs):
@@ -365,8 +365,12 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
             if self.name == 'full' and self.sameAsGatewayS.get() and self.isServerS.get(): self.serverS.config(state='normal')
             elif self.name == 'mini': self.serverS.config(state='normal')
         
-        if self.networkOn == True: self.networkS.config(bg='green', text='Yes', fg='white')
-        else: self.networkS.config(bg='red', text='No', fg='white')
+        if self.networkOn == True:
+            self.networkS.config(bg='green', text='Yes', fg='white')
+            return True
+        else:
+            self.networkS.config(bg='red', text='No', fg='white')
+            return False
     
     def setServing(self):
         if self.isServing: self.servingS.config(text='Yes', bg='green')
@@ -732,9 +736,11 @@ class FullFileTranxFer(FileTranxFer):
         if self.path: self.sendDetails.localLoad(self.path)
     
     def setNetwork(self):
-        super().setNetwork()
-        if self.networkInfo: self.gatewayS.config(text=self.networkInfo.gateway)
-        else:  self.gatewayS.config(text='No network.')
+        d = super().setNetwork()
+        if d:
+            if self.networkInfo: self.gatewayS.config(text=self.networkInfo.gateway)
+            else:  self.gatewayS.config(text='No network.')
+            return d
     
     def loadNetworkInfo(self, e=0):
         self.setNetwork()
@@ -747,12 +753,19 @@ class FullFileTranxFer(FileTranxFer):
         if e==0: self.root.after(1000, self.loadNetworkInfo)
     
     def isGateway(self):
+        d = self.setNetwork()
         if self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
         else:
+            if not d:
+                show(title='Network Error', msg='Network not ON', which='error')
+                return
             self.serverSet = False
             self.isServerS.set('0')
             if self.sameAsGatewayS.get():
-                self.serverEnt.set(self.networkInfo.gateway if self.networkInfo else self.lh)
+                ip = self.lh
+                if self.networkInfo.gateway:
+                    ip = self.networkInfo.gateway or ''
+                self.serverS.set(ip)
                 self.serverS.config(state='disabled')
             else: self.serverS.config(state='normal')
     

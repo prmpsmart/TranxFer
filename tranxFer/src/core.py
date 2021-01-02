@@ -1,5 +1,5 @@
 import logging, datetime, json, os, threading, zipfile, subprocess, time
-from prmp_miscs.prmp_mixins import PRMP_Mixins
+from .prmp_miscs import PRMP_Mixins
 
 # platform
 def which_platform():
