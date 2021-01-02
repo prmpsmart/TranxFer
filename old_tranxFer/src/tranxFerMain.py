@@ -1,7 +1,8 @@
 import argparse
-from .gui import FileTranxFer, FileTranxFer, os, autoDownload, autoUpload, TranxFerLogger
-
-PATH = os.path
+from .tranxFer import autoDownload, autoUpload
+from .tranxFerGui import FileTranxFer, GuiMixin
+from .tranxFerGui import path as PATH
+from .tranxFerLogger import TranxFerLogger
 
 def tranxFerMain():
     parser = argparse.ArgumentParser(prog='TranxFer', description="TranxFer by PRMP Smart", epilog="By PRMP Smart < prmpsmart@gmail.com >")
@@ -52,10 +53,10 @@ def tranxFerMain():
     print(result)
     
     if full or mini:
-        FileTranxFer._path = path or dest
-        FileTranxFer._port = port
-        FileTranxFer._server = addr
-        FileTranxFer._compress = compress
+        GuiMixin._path = path or dest
+        GuiMixin._port = port
+        GuiMixin._server = addr
+        GuiMixin._compress = compress
         if mini: FileTranxFer(0)
         else: FileTranxFer()
     
