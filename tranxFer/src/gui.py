@@ -1,4 +1,4 @@
-from .prmp_gui import *
+from prmp_gui import *
 from .core import *
 
 def show(title=None, msg=None, which='info', **kwargs):
@@ -297,7 +297,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     
     def defaults(self):
         self.path = self._path
-        self.serverS.set(self._server)
+        self.serverS.set(self._server or '')
         self.portS.set(self._port)
     
     def exiting(self):
@@ -440,7 +440,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
                     port = self.getPort()
                     if port:
                         if self.client == None:
-                            self.client = Client(server, port, True if self.handShake.get() else False)
+                            self.client = Client(server, port, True if self.handShakeS.get() else False)
                             self.connecting = True
     
     def serve(self):

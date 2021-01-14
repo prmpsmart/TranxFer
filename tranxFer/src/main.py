@@ -1,5 +1,5 @@
 import argparse
-from .gui import FileTranxFer, FileTranxFer, os, autoDownload, autoUpload, TranxFerLogger
+from .gui import GuiFileTranxFer, FileTranxFer, os, autoDownload, autoUpload, TranxFerLogger
 
 PATH = os.path
 
@@ -56,8 +56,8 @@ def tranxFerMain():
         FileTranxFer._port = port
         FileTranxFer._server = addr
         FileTranxFer._compress = compress
-        if mini: FileTranxFer(0)
-        else: FileTranxFer()
+        if mini: GuiFileTranxFer(0)
+        else: GuiFileTranxFer()
     
     else:
         if download:

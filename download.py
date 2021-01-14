@@ -1,6 +1,6 @@
-from tranxFer.src.tranxFer import autoDownload, TranxFerLogger
+from tranxFer.src.core import autoDownload, TranxFerLogger
 TranxFerLogger.setLevel('c')
 
 d = 'zips'
 
-autoDownload(dest=d, ip='192.168.43.1')
+autoDownload(dest=d)#, ip='192.168.43.1')
