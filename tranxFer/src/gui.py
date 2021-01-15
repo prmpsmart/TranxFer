@@ -1,4 +1,5 @@
 from prmp_gui import *
+from prmp_gui.dialogs import *
 from .core import *
 
 def show(title=None, msg=None, which='info', **kwargs):
@@ -145,7 +146,7 @@ class Details(LabelFrame):
         self.destPath = ''
         if self.destDir.get():
             p = dialogFunc(path=1, folder=1)
-            if os.path.exists(p): self.destPath = p
+            if  PRMP_Mixins.checkPath(None, p): self.destPath = p
             else: show('Path Error', 'The choosen directory does not exists', 'warn')
     
     def setDetails(self):
@@ -273,8 +274,6 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
 
         self.serverDefault()
         
-        # if get_os_name() != 'Android':  self.attributes('-tool', True)
-        
         self.bind('<Control-M>', os.sys.exit)
         self.bind('<Control-m>', os.sys.exit)
         self.bind('<Control-n>', self.new)
@@ -282,7 +281,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         self.bind('<Control-a>', self.another)
         self.bind('<Control-A>', self.another)
         
-        self.protocol('WM_DELETE_WINDOW', self.exiting)
+        # self.protocol('WM_DELETE_WINDOW', self.exiting)
 
         self.defaults()
         self.paint()
@@ -300,7 +299,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         self.serverS.set(self._server or '')
         self.portS.set(self._port)
     
-    def exiting(self):
+    def closing(self):
         try: self.stop(1)
         except Exception as error: TranxFerLogger.debug(error)
         os.sys.exit()
@@ -455,7 +454,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     def browse(self):
         self.path = ''
         _path = dialogFunc(path=1, folder=int(self.isDir.get()))
-        if os.path.exists(_path):
+        if  PRMP_Mixins.checkPath(None, _path):
             self.path = _path
             return _path
         elif _path == '': return
@@ -510,11 +509,11 @@ class MiniFileTranxFer(FileTranxFer):
 
         self.network = LabelFrame(cont, place=dict(relx=.02, rely=.02, relh=.47, relw=.96))
         
-        self.titleL = Label(self.network, text='''Mini FileTranxFer by PRMP Smart!!!.''', place=dict(relx=.01, rely=.02, relh=.3, relw=.98))
+        self.clock = Label(self.network, place=dict(relx=.01, rely=.02, relh=.3, relw=.18))
         
-        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.2), relief='flat')
+        self.titleL = Label(self.network, text='''Mini FileTranxFer by PRMP Smart!!!.''', place=dict(relx=.19, rely=.02, relh=.3, relw=.61))
         
-        self.full = Button(self.titleL, text='''Full''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2), relief='flat')
+        self.full = Button(self.network, text='''Full''', command=self.another, place=dict(relx=.8, rely=.02, relh=.3, relw=.2))
         
         self.networkL = Label(self.network, text='Network?', place=dict(relx=.01, rely=.34, relh=.3, relw=.15))
         self.networkS = Label(self.network, place=dict(relx=.17, rely=.34, relh=.3, relw=.1))
@@ -537,9 +536,9 @@ class MiniFileTranxFer(FileTranxFer):
         
         self.pathCont = LabelFrame(cont, place=dict(relx=.02, rely=.5, relh=.48, relw=.96))
         
-        self.pathEnt = Entry(self.pathCont, place=dict(relx=.02, rely=.02,relh=.25, relw=.96))
-        self.pathEnt.bind('<Return>', self.checkPath)
-        self.pathEnt.bind('<KeyRelease>', self.setPath)
+        self.pathEnt = Entry(self.pathCont, place=dict(relx=.02, rely=.02,relh=.25, relw=.96), _type='path')
+        self.pathEnt.bind('<Return>', self.checkPath, '+')
+        self.pathEnt.bind('<KeyRelease>', self.setPath, '+')
 
         self.browseBtn = Button(self.pathCont, text='''Browse''', command=self.browse, place=dict(relx=.02, rely=.33, relh=.25, relw=.134))
         
@@ -562,9 +561,9 @@ class MiniFileTranxFer(FileTranxFer):
         self.tick()
     
     def setPath(self, e=0):
-        self.pathEnt.set(self.path)
-        if os.path.exists(self.path):
-            AutoUploadHandler.setPath(self.path)
+        if e: self.path = self.pathEnt.get()
+        else: self.pathEnt.set(self.path)
+        if PRMP_Mixins.checkPath(None, self.path): AutoUploadHandler.setPath(self.path)
     
     def browse(self):
         super().browse()
@@ -581,7 +580,7 @@ class MiniFileTranxFer(FileTranxFer):
         self.sentS.config(text=AutoUploadHandler.count)
         if not self.isServing:
             if not self.localhostS.get():
-                if self.networkInfo: self.serverS.set(self.networkInfo.ip)
+                if not self.serverS.get() and self.networkInfo: self.serverS.set(self.networkInfo.ip)
             self.serverS.config(state='disabled')
     
     def stop(self, ev=0):
@@ -647,13 +646,12 @@ class FullFileTranxFer(FileTranxFer):
     
     def _setupApp(self):
         cont = self.container
+        
+        self.clock = Label(cont, place=dict(relx=.02, rely=.01, relh=.029, relw=.24)); self.tick()
 
-        self.titleL = Label(cont,  text='FileTranxFer by PRMPSmart', place=dict(relx=.01, rely=.01, relh=.029, relw=.98))
+        self.titleL = Label(cont,  text='FileTranxFer by PRMPSmart', place=dict(relx=.26, rely=.01, relh=.029, relw=.54))
         
-        self.clock = Label(self.titleL, place=dict(relx=0, rely=0, relh=1, relw=.24), relief='flat')
-        self.tick()
-        
-        self.miniBtn = Button(self.titleL, text='''Mini''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2), relief='flat')
+        self.miniBtn = Button(cont, text='''Mini''', command=self.another, place=dict(relx=.8, rely=.01, relh=.029, relw=.2))
         
         self.localhostS = Checkbutton(cont,  text='Localhost?', place=dict(relx=.02, rely=.045, relh=.04, relw=.3))
         
