@@ -14,7 +14,8 @@ creator.py
 *.txt
 *.xml
 prmpsmart_temp.py
-/zips
-/compile
-/others
-/pics
+zips
+compile
+others
+others2
+pics
