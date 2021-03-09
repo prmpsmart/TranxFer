@@ -1,6 +1,16 @@
 from prmp_gui import *
 from prmp_gui.dialogs import *
+from prmp_gui.two_widgets import *
 from .core import *
+
+class TLabel(Label):
+    def __init__(self, master, font='', **kwargs):
+        super().__init__(master, font='TkFont', **kwargs)
+
+Label = TLabel
+TwoWidgets.top_widgets['label'] = TLabel
+
+# PRMP_Widget.TIPPING = 1
 
 def show(title=None, msg=None, which='info', **kwargs):
     if which == 'error':
@@ -169,29 +179,29 @@ class Details(LabelFrame):
         if pathStat: self.pathStat = pathStat
         if self.pathStat:
             self.nameS.config(text=self.pathStat.name)
-            self.nameS.tip.update(self.pathStat.fullName)
+            # self.nameS.tip.update(self.pathStat.fullName)
 
             self.sizeS.config(text=self.pathStat.fSize)
-            self.sizeS.tip.update(self.pathStat.fullSize)
+            # self.sizeS.tip.update(self.pathStat.fullSize)
 
             self.typeS.config(text=self.pathStat.type)
-            self.typeS.tip.update(self.pathStat.fullType)
+            # self.typeS.tip.update(self.pathStat.fullType)
 
             self.ctimeS.config(text=self.pathStat.cTime)
-            self.ctimeS.tip.update(self.pathStat.fullCTime)
+            # self.ctimeS.tip.update(self.pathStat.fullCTime)
 
             self.atimeS.config(text=self.pathStat.aTime)
-            self.atimeS.tip.update(self.pathStat.fullATime)
+            # self.atimeS.tip.update(self.pathStat.fullATime)
 
             self.mtimeS.config(text=self.pathStat.mTime)
-            self.mtimeS.tip.update(self.pathStat.fullMTime)
+            # self.mtimeS.tip.update(self.pathStat.fullMTime)
 
             self.filesCountS.config(text=self.pathStat.filesCount)
 
             self.dirsCountS.config(text=self.pathStat.dirsCount)
 
             self.innerSizeS.config(text=self.pathStat.fInnerSize)
-            self.innerSizeS.tip.update(self.pathStat.fullInnerSize)
+            # self.innerSizeS.tip.update(self.pathStat.fullInnerSize)
         self.after(1000, self.load)
 
     def localLoad(self, path):
@@ -260,8 +270,8 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     _name = 'gui'
     geo = (600, 270)
 
-    def __init__(self, master=None, geo=(), title="File TranxFer", tm=1, tw=1, side='center', **kwargs):
-        PRMP_MainWindow.__init__(self, master, geo=geo or self.geo, title=title, side=side, tm=tm, tw=tw, **kwargs)
+    def __init__(self, master=None, geo=(), title="File TranxFer", **kwargs):
+        PRMP_MainWindow.__init__(self, master, geo=geo or self.geo, title=title, **kwargs)
 
         self.path = ''
         self.networkInfo = None
